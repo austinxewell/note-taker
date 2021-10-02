@@ -27,8 +27,8 @@ app.get('*', (req, res) => {
 
 //  post routes
 app.post('/api/notes', (req, res) => {
-
     const newNote = req.body;
+    
     noteArry.push(newNote)
     writeFile('./develop/db/db.json', JSON.stringify(noteArry), () => {
         console.log('success')
