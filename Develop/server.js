@@ -1,9 +1,8 @@
 const express = require('express');
-const { writeFile } = require('fs');
+const { writeFile, readFile } = require('fs');
 const app = express();
 const PORT = 3001;
 const path = require('path')
-const noteArry = require('./db/db.json')
 app.use(express.urlencoded({extended: true}))
 app.use(express.json());
 app.use(express.static('public'))
@@ -26,15 +25,38 @@ app.get('*', (req, res) => {
 });
 
 //  post routes
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes/', (req, res) => {
     const newNote = req.body;
-    
-    noteArry.push(newNote)
-    writeFile('./develop/db/db.json', JSON.stringify(noteArry), () => {
-        console.log('success')
+
+    readFile('./db/db.json', 'utf8', (err, data) => {
+        if(err) throw err
+        const noteArry = JSON.parse(data)
+        
+        newNote.id = noteArry.length.toString();
+        noteArry.push(newNote)
+        writeFile('./db/db.json', JSON.stringify(noteArry), () => {
+            console.log('success')
+            res.json(newNote);
+        })
     })
-    res.json(newNote);
 });
+
+// deletes notes
+app.delete('/api/notes/:id', (req, res) => {
+    req.params.id
+    readFile('./db/db.json', 'utf8', (err, data) => {
+        if (err) throw err
+        const notes = JSON.parse(data)
+        const filteredNotes = notes.filter(note => {
+            return req.params.id !== note.id
+        })
+        writeFile('./db/db.json', JSON.stringify(filteredNotes), () => {
+            console.log('success')
+            res.json(filteredNotes)
+        })
+    })
+})
+
 
 // starts server
 app.listen(PORT, () => {
