@@ -1,7 +1,7 @@
 const express = require('express');
 const { writeFile, readFile } = require('fs');
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const path = require('path')
 app.use(express.urlencoded({extended: true}))
 app.use(express.json());
